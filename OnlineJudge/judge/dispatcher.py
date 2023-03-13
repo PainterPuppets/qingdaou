@@ -60,6 +60,8 @@ class DispatcherBase(object):
         kwargs = {"headers": {"X-Judge-Server-Token": self.token}}
         if data:
             kwargs["json"] = data
+        print('_request kwargs')
+        print(kwargs)
         try:
             return requests.post(url, **kwargs).json()
         except Exception as e:
@@ -123,6 +125,7 @@ class JudgeDispatcher(DispatcherBase):
             self.submission.statistic_info["score"] = score
 
     def judge(self):
+        print("JudgeDispatcher judge")
         language = self.submission.language
         sub_config = list(filter(lambda item: language == item["name"], SysOptions.languages))[0]
         spj_config = {}
@@ -151,6 +154,8 @@ class JudgeDispatcher(DispatcherBase):
             "spj_src": self.problem.spj_code,
             "io_mode": self.problem.io_mode
         }
+        print(data)
+
 
         with ChooseJudgeServer() as server:
             if not server:
@@ -158,6 +163,11 @@ class JudgeDispatcher(DispatcherBase):
                 cache.lpush(CacheKey.waiting_queue, json.dumps(data))
                 return
             Submission.objects.filter(id=self.submission.id).update(result=JudgeStatus.JUDGING)
+            logger.info('request /judge, data: ')
+            logger.info(data)
+
+            print('request /judge, data: ')
+            logger.info(data)
             resp = self._request(urljoin(server.service_url, "/judge"), data=data)
 
         if not resp:

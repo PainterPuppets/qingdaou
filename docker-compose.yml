@@ -22,7 +22,7 @@ services:
       - "5432"
 
   judge-server:
-    image: onlinejudge/judge_server
+    image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/judge_server
     build: ./JudgeServer
     container_name: judge-server
     restart: always
@@ -40,14 +40,18 @@ services:
       - ./data/backend/test_case:/test_case:ro
       - ./data/judge_server/log:/log
       - ./data/judge_server/run:/judger
+      # - ./playground:/playground
     environment:
       - SERVICE_URL=http://judge-server:8080
       - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
       - TOKEN=CHANGE_THIS
-      # - judger_debug=1
+      # - judger_debug=1=
+    ports:
+      - "0.0.0.0:8080:8080"
   
   oj-backend:
     image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/oj_backend
+    # build: ./OnlineJudge
     container_name: oj-backend
     restart: always
     depends_on:
