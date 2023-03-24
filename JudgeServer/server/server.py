@@ -59,6 +59,7 @@ class JudgeServer:
     def judge(cls, language_config, src, max_cpu_time, max_memory, test_case_id=None, test_case=None,
               spj_version=None, spj_config=None, spj_compile_config=None, spj_src=None, output=False,
               io_mode=None):
+        logger.warning('this is info logger, before judge')
         if not io_mode:
             io_mode = {"io_mode": ProblemIOMode.standard}
 
@@ -71,7 +72,7 @@ class JudgeServer:
 
         is_spj = spj_version and spj_config
 
-        if is_spj:
+        if is_spj and spj_compile_config:
             spj_exe_path = os.path.join(SPJ_EXE_DIR, spj_config["exe_name"].format(spj_version=spj_version))
             # spj src has not been compiled
             if not os.path.isfile(spj_exe_path):
@@ -198,6 +199,18 @@ def server(path):
             ret = {"err": "JudgeClientError", "data": e.__class__.__name__ + " :" + str(e)}
     else:
         ret = {"err": "InvalidRequest", "data": "404"}
+    return Response(json.dumps(ret), mimetype='application/json')
+
+@app.route('/test_solidity', defaults={'path': ''})
+def server(path):
+    try:
+        ret = {"err": None, "data": getattr(JudgeServer, path)(**data)}
+    except (CompileError, TokenVerificationFailed, SPJCompileError, JudgeClientError) as e:
+        logger.exception(e)
+        ret = {"err": e.__class__.__name__, "data": e.message}
+    except Exception as e:
+        logger.exception(e)
+        ret = {"err": "JudgeClientError", "data": e.__class__.__name__ + " :" + str(e)}
     return Response(json.dumps(ret), mimetype='application/json')
 
 

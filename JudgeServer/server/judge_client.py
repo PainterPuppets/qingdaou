@@ -117,9 +117,16 @@ class JudgeClient(object):
             real_user_output_file = user_output_file = os.path.join(self._submission_dir, test_case_file_id + ".out")
             kwargs = {"input_path": in_file, "output_path": real_user_output_file, "error_path": real_user_output_file}
 
-        command = self._run_config["command"].format(exe_path=self._exe_path, exe_dir=os.path.dirname(self._exe_path),
-                                                     max_memory=int(self._max_memory / 1024))
+        command = self._run_config["command"].format(
+            exe_path=self._exe_path,
+            exe_dir=os.path.dirname(self._exe_path),
+            max_memory=int(self._max_memory / 1024),
+            # run_args=self._spj_config['run_args'] if 'run_args' in self._spj_config else '',
+        )
         command = shlex.split(command)
+
+        print('------------_judge_one command-----------')
+        print(command)
         env = ["PATH=" + os.environ.get("PATH", "")] + self._run_config.get("env", [])
 
         seccomp_rule = self._run_config["seccomp_rule"]
@@ -174,6 +181,7 @@ class JudgeClient(object):
             except Exception:
                 pass
 
+        print(run_result)
         return run_result
 
     def run(self):

@@ -49,6 +49,7 @@ class SubmissionAPI(APIView):
     @login_required
     def post(self, request):
         data = request.data
+        print("post /submission")
         hide_id = False
         if data.get("contest_id"):
             error = self.check_contest_permission(request)

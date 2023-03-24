@@ -42,6 +42,7 @@ class Compiler(object):
                     error = f.read().strip()
                     os.remove(compiler_out)
                     if error:
+                        print(error)
                         raise CompileError(error)
             raise CompileError("Compiler runtime error, info: %s" % json.dumps(result))
         else:

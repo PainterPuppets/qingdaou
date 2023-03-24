@@ -6,6 +6,9 @@ chown compiler:code /judger/run
 chmod 711 /judger/run
 
 chown compiler:spj /judger/spj
+chmod 711 /judger/run
+
+chown compiler:spj /judger/spj
 chmod 710 /judger/spj
 
 core=$(grep --count ^processor /proc/cpuinfo)
